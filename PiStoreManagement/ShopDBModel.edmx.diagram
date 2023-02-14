@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="efc7785fa18f4b90a7b8a4663f7f0d41" Name="Diagram1">
+        <EntityTypeShape EntityType="ShopDBModel.Bill" Width="1.5" PointX="3" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopDBModel.Client" Width="1.5" PointX="0.75" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopDBModel.Employee" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopDBModel.ManagerAccount" Width="1.5" PointX="0.75" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopDBModel.Order" Width="1.5" PointX="6" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopDBModel.OrderItem" Width="1.5" PointX="8.25" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopDBModel.Product" Width="1.5" PointX="6" PointY="1" IsExpanded="true" />
+        <AssociationConnector Association="ShopDBModel.FK__Bill__ClientID__3E52440B" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopDBModel.FK__Bill__EmployeeID__3F466844" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopDBModel.FK__Bill__OrderID__3D5E1FD2" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopDBModel.FK__Order__ClientID__31EC6D26" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopDBModel.FK__Order__EmployeeI__32E0915F" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopDBModel.FK__OrderItem__Order__37A5467C" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopDBModel.FK__OrderItem__Produ__38996AB5" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
