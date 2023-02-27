@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,13 +29,14 @@ namespace PiStoreManagement.Managements
             dataGridViewProducts.Columns.Add(TextDictionary.PRODUCT_QUANTYTY_COLUMN_NAME, TextDictionary.PRODUCT_QUANTYTY_COLUMN_TEXT);
             dataGridViewProducts.Columns.Add(TextDictionary.PRODUCT_DESCRIPTION_COLUMN_NAME, TextDictionary.PRODUCT_DESCRIPTION_COLUMN_TEXT);
 
-            DataGridViewButtonColumn DeleteButton = new DataGridViewButtonColumn();
-            DeleteButton.Name = TextDictionary.CONTROL_DELETE_BUTTON_NAME;
-            DeleteButton.Text = TextDictionary.CONTROL_DELETE_BUTTON_TEXT;
-            DeleteButton.UseColumnTextForButtonValue = true;
+            DataGridViewButtonColumn ButtonInColumn = new DataGridViewButtonColumn();
+            ButtonInColumn.Name = TextDictionary.CONTROL_DELETE_BUTTON_NAME;
+            ButtonInColumn.Text = TextDictionary.CONTROL_DELETE_BUTTON_TEXT;
+            ButtonInColumn.FlatStyle = FlatStyle.Flat;
+            ButtonInColumn.UseColumnTextForButtonValue = true;
             if (dataGridViewProducts.Columns[TextDictionary.CONTROL_DELETE_COLUMN_NAME] == null)
             {
-                dataGridViewProducts.Columns.Insert(dataGridViewProducts.Columns.Count, DeleteButton);
+                dataGridViewProducts.Columns.Insert(dataGridViewProducts.Columns.Count, ButtonInColumn);
             }
         }
 
@@ -56,9 +58,17 @@ namespace PiStoreManagement.Managements
         {
             dataGridViewProducts.ClearSelection();
             dataGridViewProducts.Rows.Clear();
+
+            string keyFilter = txtSearch.Text.ToString().ToLower();
             foreach (Product p in products)
             {
-                dataGridViewProducts.Rows.Add(p.ID, p.Name, p.Price, p.Quantity, p.Decription);
+                if (
+                    p.ID.ToLower().Contains(keyFilter) ||
+                    p.Name.ToLower().Contains(keyFilter)
+                  )
+                {
+                    dataGridViewProducts.Rows.Add(p.ID, p.Name, p.Price, p.Quantity, p.Decription);
+                }
             }
         }
 
@@ -121,12 +131,10 @@ namespace PiStoreManagement.Managements
 
         private void btnExportCsv_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void btnSearch_Click(object sender, EventArgs e)
-        {
-
+            string filename = "Products " + DateTime.Now.ToString().Replace('/', '-').Replace(':', '-');
+            List<string> skips = new List<string>() { TextDictionary.CONTROL_DELETE_COLUMN_NAME };
+            int res = DataExporter.ExportToCSV(dataGridViewProducts, filename, skips);
+            MessageBox.Show(res + " row was exported!");
         }
 
         private void txtName_TextChanged(object sender, EventArgs e)
@@ -141,7 +149,33 @@ namespace PiStoreManagement.Managements
 
         private void dataGridViewProducts_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            DataGridViewCellCollection cells = dataGridViewProducts.Rows[e.RowIndex].Cells;
+            switch (dataGridViewProducts.Columns[e.ColumnIndex].Name)
+            {
+                case TextDictionary.CONTROL_DELETE_BUTTON_NAME:
+                    DialogResult dialogResult = MessageBox.Show(TextDictionary.MESSAGE_COMFIRM_DELETE,
+                        TextDictionary.TITLE_COMFIRM_DELETE, MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        string ID = cells[TextDictionary.PRODUCT_ID_COLUMN_NAME].Value.ToString();
+                        Product product = ShopDB.GetShopDBEntities().Products.FirstOrDefault(p => p.ID.Equals(ID));
+                        if(product.OrderItems.Count > 0)
+                        {
+                            MessageBox.Show(TextDictionary.MESSAGE_CANNOT_REMOVE_PRODUCT_BY_ORDER);
+                        }
+                        else
+                        {
+                            ShopDB.GetShopDBEntities().Products.Remove(product);
+                            ShopDB.SaveChanges();
+                            ReloadProductGrid();
+                        }
+                    }
+                    break;
+                default:
+                    
+                    break;
+            }
         }
 
         private void frmProduct_VisibleChanged(object sender, EventArgs e)
@@ -153,23 +187,69 @@ namespace PiStoreManagement.Managements
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
             DataGridViewCellCollection cells = dataGridViewProducts.Rows[e.RowIndex].Cells;
-            switch (dataGridViewProducts.Columns[e.ColumnIndex].Name)
+            ShowRowCellsData(cells);
+        }
+
+        private void dataGridViewProducts_VisibleChanged(object sender, EventArgs e)
+        {
+            if (dataGridViewProducts.ColumnCount == 0) return;
+            ReloadProductGrid();
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            ReloadProductGrid();
+        }
+
+        private void btnClearSearch_Click(object sender, EventArgs e)
+        {
+            txtSearch.Text = string.Empty;
+            ReloadProductGrid();
+        }
+
+        private void btnImportTestData_Click(object sender, EventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+            openFileDialog.RestoreDirectory = true;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                case TextDictionary.CONTROL_DELETE_COLUMN_NAME:
-                    DialogResult dialogResult = MessageBox.Show(TextDictionary.MESSAGE_COMFIRM_DELETE,
-                        TextDictionary.TITLE_COMFIRM_DELETE, MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.Yes)
+                string filePath = openFileDialog.FileName;
+                using (var reader = new StreamReader(filePath))
+                {
+                    Product product;
+
+                    while (!reader.EndOfStream)
                     {
-                        string ID = cells[TextDictionary.PRODUCT_ID_COLUMN_NAME].Value.ToString();
-                        Product product = ShopDB.GetShopDBEntities().Products.FirstOrDefault(p => p.ID.Equals(ID));
-                        ShopDB.GetShopDBEntities().Products.Remove(product);
-                        ShopDB.SaveChanges();
-                        ReloadProductGrid();
+                        var line = reader.ReadLine();
+                        var values = line.Split(',');
+                        try
+                        {
+                            product = new Product();
+                            product.ID = values[0];
+                            product.Name = values[1];
+                            product.Price = double.Parse(values[2]);
+                            product.Quantity = int.Parse(values[3]);
+                            product.Decription = values[4];
+
+                            if (ShopDB.GetShopDBEntities().Products.FirstOrDefault(x => x.ID.Equals(product.ID)) != null)
+                            {
+                                continue;
+                            }
+
+                            ShopDB.GetShopDBEntities().Products.Add(product);
+                        }
+                        catch (Exception ex)
+                        {
+                            //MessageBox.Show(ex.Message);
+                            Console.WriteLine(ex.Message);
+                        }
                     }
-                    break;
-                default:
-                    ShowRowCellsData(cells);
-                    break;
+
+                    ShopDB.SaveChanges();
+                    ReloadProductGrid();
+                }
             }
         }
     }

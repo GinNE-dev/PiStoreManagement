@@ -18,6 +18,7 @@ namespace PiStoreManagement
         public Employee()
         {
             this.Bills = new HashSet<Bill>();
+            this.ManagerAccounts = new HashSet<ManagerAccount>();
             this.Orders = new HashSet<Order>();
         }
     
@@ -31,6 +32,8 @@ namespace PiStoreManagement
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Bill> Bills { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ManagerAccount> ManagerAccounts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Order> Orders { get; set; }
     }

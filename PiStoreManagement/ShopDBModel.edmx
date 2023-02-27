@@ -23,7 +23,7 @@
           <Property Name="ID" Type="char" MaxLength="36" Nullable="false" />
           <Property Name="Name" Type="varchar" MaxLength="50" />
           <Property Name="Email" Type="varchar" MaxLength="50" />
-          <Property Name="Phone" Type="char" MaxLength="13" Nullable="false" />
+          <Property Name="Phone" Type="char" MaxLength="13" />
           <Property Name="Address" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Employee">
@@ -43,6 +43,7 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="char" MaxLength="36" Nullable="false" />
+          <Property Name="EmployeeID" Type="char" MaxLength="36" />
           <Property Name="Username" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Password" Type="char" MaxLength="64" Nullable="false" />
         </EntityType>
@@ -75,7 +76,7 @@
           <Property Name="Price" Type="float" Nullable="false" />
           <Property Name="Quantity" Type="int" Nullable="false" />
         </EntityType>
-        <Association Name="FK__Bill__ClientID__3E52440B">
+        <Association Name="FK__Bill__ClientID__3F466844">
           <End Role="Client" Type="Self.Client" Multiplicity="0..1" />
           <End Role="Bill" Type="Self.Bill" Multiplicity="*" />
           <ReferentialConstraint>
@@ -87,7 +88,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Bill__EmployeeID__3F466844">
+        <Association Name="FK__Bill__EmployeeID__403A8C7D">
           <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
           <End Role="Bill" Type="Self.Bill" Multiplicity="*" />
           <ReferentialConstraint>
@@ -99,7 +100,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Bill__OrderID__3D5E1FD2">
+        <Association Name="FK__Bill__OrderID__3E52440B">
           <End Role="Order" Type="Self.Order" Multiplicity="0..1" />
           <End Role="Bill" Type="Self.Bill" Multiplicity="*" />
           <ReferentialConstraint>
@@ -111,7 +112,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Order__ClientID__31EC6D26">
+        <Association Name="FK__ManagerAc__Emplo__286302EC">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="ManagerAccount" Type="Self.ManagerAccount" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="ManagerAccount">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Order__ClientID__32E0915F">
           <End Role="Client" Type="Self.Client" Multiplicity="0..1" />
           <End Role="Order" Type="Self.Order" Multiplicity="*" />
           <ReferentialConstraint>
@@ -123,7 +136,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Order__EmployeeI__32E0915F">
+        <Association Name="FK__Order__EmployeeI__33D4B598">
           <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
           <End Role="Order" Type="Self.Order" Multiplicity="*" />
           <ReferentialConstraint>
@@ -135,7 +148,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderItem__Order__37A5467C">
+        <Association Name="FK__OrderItem__Order__38996AB5">
           <End Role="Order" Type="Self.Order" Multiplicity="0..1" />
           <End Role="OrderItem" Type="Self.OrderItem" Multiplicity="*" />
           <ReferentialConstraint>
@@ -147,7 +160,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderItem__Produ__38996AB5">
+        <Association Name="FK__OrderItem__Produ__398D8EEE">
           <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
           <End Role="OrderItem" Type="Self.OrderItem" Multiplicity="*" />
           <ReferentialConstraint>
@@ -167,31 +180,35 @@
           <EntitySet Name="Order" EntityType="Self.Order" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OrderItem" EntityType="Self.OrderItem" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__Bill__ClientID__3E52440B" Association="Self.FK__Bill__ClientID__3E52440B">
+          <AssociationSet Name="FK__Bill__ClientID__3F466844" Association="Self.FK__Bill__ClientID__3F466844">
             <End Role="Client" EntitySet="Client" />
             <End Role="Bill" EntitySet="Bill" />
           </AssociationSet>
-          <AssociationSet Name="FK__Bill__EmployeeID__3F466844" Association="Self.FK__Bill__EmployeeID__3F466844">
+          <AssociationSet Name="FK__Bill__EmployeeID__403A8C7D" Association="Self.FK__Bill__EmployeeID__403A8C7D">
             <End Role="Employee" EntitySet="Employee" />
             <End Role="Bill" EntitySet="Bill" />
           </AssociationSet>
-          <AssociationSet Name="FK__Bill__OrderID__3D5E1FD2" Association="Self.FK__Bill__OrderID__3D5E1FD2">
+          <AssociationSet Name="FK__Bill__OrderID__3E52440B" Association="Self.FK__Bill__OrderID__3E52440B">
             <End Role="Order" EntitySet="Order" />
             <End Role="Bill" EntitySet="Bill" />
           </AssociationSet>
-          <AssociationSet Name="FK__Order__ClientID__31EC6D26" Association="Self.FK__Order__ClientID__31EC6D26">
+          <AssociationSet Name="FK__ManagerAc__Emplo__286302EC" Association="Self.FK__ManagerAc__Emplo__286302EC">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="ManagerAccount" EntitySet="ManagerAccount" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Order__ClientID__32E0915F" Association="Self.FK__Order__ClientID__32E0915F">
             <End Role="Client" EntitySet="Client" />
             <End Role="Order" EntitySet="Order" />
           </AssociationSet>
-          <AssociationSet Name="FK__Order__EmployeeI__32E0915F" Association="Self.FK__Order__EmployeeI__32E0915F">
+          <AssociationSet Name="FK__Order__EmployeeI__33D4B598" Association="Self.FK__Order__EmployeeI__33D4B598">
             <End Role="Employee" EntitySet="Employee" />
             <End Role="Order" EntitySet="Order" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderItem__Order__37A5467C" Association="Self.FK__OrderItem__Order__37A5467C">
+          <AssociationSet Name="FK__OrderItem__Order__38996AB5" Association="Self.FK__OrderItem__Order__38996AB5">
             <End Role="Order" EntitySet="Order" />
             <End Role="OrderItem" EntitySet="OrderItem" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderItem__Produ__38996AB5" Association="Self.FK__OrderItem__Produ__38996AB5">
+          <AssociationSet Name="FK__OrderItem__Produ__398D8EEE" Association="Self.FK__OrderItem__Produ__398D8EEE">
             <End Role="Product" EntitySet="Product" />
             <End Role="OrderItem" EntitySet="OrderItem" />
           </AssociationSet>
@@ -211,9 +228,9 @@
           <Property Name="EmployeeID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" />
           <Property Name="BillDate" Type="DateTime" Precision="0" />
           <Property Name="TotalPrice" Type="Double" Nullable="false" />
-          <NavigationProperty Name="Client" Relationship="Self.FK__Bill__ClientID__3E52440B" FromRole="Bill" ToRole="Client" />
-          <NavigationProperty Name="Employee" Relationship="Self.FK__Bill__EmployeeID__3F466844" FromRole="Bill" ToRole="Employee" />
-          <NavigationProperty Name="Order" Relationship="Self.FK__Bill__OrderID__3D5E1FD2" FromRole="Bill" ToRole="Order" />
+          <NavigationProperty Name="Client" Relationship="Self.FK__Bill__ClientID__3F466844" FromRole="Bill" ToRole="Client" />
+          <NavigationProperty Name="Employee" Relationship="Self.FK__Bill__EmployeeID__403A8C7D" FromRole="Bill" ToRole="Employee" />
+          <NavigationProperty Name="Order" Relationship="Self.FK__Bill__OrderID__3E52440B" FromRole="Bill" ToRole="Order" />
         </EntityType>
         <EntityType Name="Client">
           <Key>
@@ -222,10 +239,10 @@
           <Property Name="ID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Phone" Type="String" MaxLength="13" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Phone" Type="String" MaxLength="13" FixedLength="true" Unicode="false" />
           <Property Name="Address" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Bills" Relationship="Self.FK__Bill__ClientID__3E52440B" FromRole="Client" ToRole="Bill" />
-          <NavigationProperty Name="Orders" Relationship="Self.FK__Order__ClientID__31EC6D26" FromRole="Client" ToRole="Order" />
+          <NavigationProperty Name="Bills" Relationship="Self.FK__Bill__ClientID__3F466844" FromRole="Client" ToRole="Bill" />
+          <NavigationProperty Name="Orders" Relationship="Self.FK__Order__ClientID__32E0915F" FromRole="Client" ToRole="Order" />
         </EntityType>
         <EntityType Name="Employee">
           <Key>
@@ -238,16 +255,19 @@
           <Property Name="Address" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Salary" Type="Double" Nullable="false" />
           <Property Name="HireDate" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="Bills" Relationship="Self.FK__Bill__EmployeeID__3F466844" FromRole="Employee" ToRole="Bill" />
-          <NavigationProperty Name="Orders" Relationship="Self.FK__Order__EmployeeI__32E0915F" FromRole="Employee" ToRole="Order" />
+          <NavigationProperty Name="Bills" Relationship="Self.FK__Bill__EmployeeID__403A8C7D" FromRole="Employee" ToRole="Bill" />
+          <NavigationProperty Name="ManagerAccounts" Relationship="Self.FK__ManagerAc__Emplo__286302EC" FromRole="Employee" ToRole="ManagerAccount" />
+          <NavigationProperty Name="Orders" Relationship="Self.FK__Order__EmployeeI__33D4B598" FromRole="Employee" ToRole="Order" />
         </EntityType>
         <EntityType Name="ManagerAccount">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="EmployeeID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" />
           <Property Name="Username" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Password" Type="String" MaxLength="64" FixedLength="true" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Employee" Relationship="Self.FK__ManagerAc__Emplo__286302EC" FromRole="ManagerAccount" ToRole="Employee" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -258,10 +278,10 @@
           <Property Name="EmployeeID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" />
           <Property Name="OrderDate" Type="DateTime" Precision="0" />
           <Property Name="TotalPrice" Type="Double" Nullable="false" />
-          <NavigationProperty Name="Bills" Relationship="Self.FK__Bill__OrderID__3D5E1FD2" FromRole="Order" ToRole="Bill" />
-          <NavigationProperty Name="Client" Relationship="Self.FK__Order__ClientID__31EC6D26" FromRole="Order" ToRole="Client" />
-          <NavigationProperty Name="Employee" Relationship="Self.FK__Order__EmployeeI__32E0915F" FromRole="Order" ToRole="Employee" />
-          <NavigationProperty Name="OrderItems" Relationship="Self.FK__OrderItem__Order__37A5467C" FromRole="Order" ToRole="OrderItem" />
+          <NavigationProperty Name="Bills" Relationship="Self.FK__Bill__OrderID__3E52440B" FromRole="Order" ToRole="Bill" />
+          <NavigationProperty Name="Client" Relationship="Self.FK__Order__ClientID__32E0915F" FromRole="Order" ToRole="Client" />
+          <NavigationProperty Name="Employee" Relationship="Self.FK__Order__EmployeeI__33D4B598" FromRole="Order" ToRole="Employee" />
+          <NavigationProperty Name="OrderItems" Relationship="Self.FK__OrderItem__Order__38996AB5" FromRole="Order" ToRole="OrderItem" />
         </EntityType>
         <EntityType Name="OrderItem">
           <Key>
@@ -271,8 +291,8 @@
           <Property Name="OrderID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" />
           <Property Name="ProductID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" />
           <Property Name="Quantity" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Order" Relationship="Self.FK__OrderItem__Order__37A5467C" FromRole="OrderItem" ToRole="Order" />
-          <NavigationProperty Name="Product" Relationship="Self.FK__OrderItem__Produ__38996AB5" FromRole="OrderItem" ToRole="Product" />
+          <NavigationProperty Name="Order" Relationship="Self.FK__OrderItem__Order__38996AB5" FromRole="OrderItem" ToRole="Order" />
+          <NavigationProperty Name="Product" Relationship="Self.FK__OrderItem__Produ__398D8EEE" FromRole="OrderItem" ToRole="Product" />
         </EntityType>
         <EntityType Name="Product">
           <Key>
@@ -283,9 +303,9 @@
           <Property Name="Decription" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="Price" Type="Double" Nullable="false" />
           <Property Name="Quantity" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="OrderItems" Relationship="Self.FK__OrderItem__Produ__38996AB5" FromRole="Product" ToRole="OrderItem" />
+          <NavigationProperty Name="OrderItems" Relationship="Self.FK__OrderItem__Produ__398D8EEE" FromRole="Product" ToRole="OrderItem" />
         </EntityType>
-        <Association Name="FK__Bill__ClientID__3E52440B">
+        <Association Name="FK__Bill__ClientID__3F466844">
           <End Role="Client" Type="Self.Client" Multiplicity="0..1" />
           <End Role="Bill" Type="Self.Bill" Multiplicity="*" />
           <ReferentialConstraint>
@@ -297,7 +317,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Bill__EmployeeID__3F466844">
+        <Association Name="FK__Bill__EmployeeID__403A8C7D">
           <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
           <End Role="Bill" Type="Self.Bill" Multiplicity="*" />
           <ReferentialConstraint>
@@ -309,7 +329,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Bill__OrderID__3D5E1FD2">
+        <Association Name="FK__Bill__OrderID__3E52440B">
           <End Role="Order" Type="Self.Order" Multiplicity="0..1" />
           <End Role="Bill" Type="Self.Bill" Multiplicity="*" />
           <ReferentialConstraint>
@@ -321,7 +341,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Order__ClientID__31EC6D26">
+        <Association Name="FK__Order__ClientID__32E0915F">
           <End Role="Client" Type="Self.Client" Multiplicity="0..1" />
           <End Role="Order" Type="Self.Order" Multiplicity="*" />
           <ReferentialConstraint>
@@ -333,7 +353,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Order__EmployeeI__32E0915F">
+        <Association Name="FK__ManagerAc__Emplo__286302EC">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="ManagerAccount" Type="Self.ManagerAccount" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="ManagerAccount">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Order__EmployeeI__33D4B598">
           <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
           <End Role="Order" Type="Self.Order" Multiplicity="*" />
           <ReferentialConstraint>
@@ -345,7 +377,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderItem__Order__37A5467C">
+        <Association Name="FK__OrderItem__Order__38996AB5">
           <End Role="Order" Type="Self.Order" Multiplicity="0..1" />
           <End Role="OrderItem" Type="Self.OrderItem" Multiplicity="*" />
           <ReferentialConstraint>
@@ -357,7 +389,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderItem__Produ__38996AB5">
+        <Association Name="FK__OrderItem__Produ__398D8EEE">
           <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
           <End Role="OrderItem" Type="Self.OrderItem" Multiplicity="*" />
           <ReferentialConstraint>
@@ -377,31 +409,35 @@
           <EntitySet Name="Orders" EntityType="Self.Order" />
           <EntitySet Name="OrderItems" EntityType="Self.OrderItem" />
           <EntitySet Name="Products" EntityType="Self.Product" />
-          <AssociationSet Name="FK__Bill__ClientID__3E52440B" Association="Self.FK__Bill__ClientID__3E52440B">
+          <AssociationSet Name="FK__Bill__ClientID__3F466844" Association="Self.FK__Bill__ClientID__3F466844">
             <End Role="Client" EntitySet="Clients" />
             <End Role="Bill" EntitySet="Bills" />
           </AssociationSet>
-          <AssociationSet Name="FK__Bill__EmployeeID__3F466844" Association="Self.FK__Bill__EmployeeID__3F466844">
+          <AssociationSet Name="FK__Bill__EmployeeID__403A8C7D" Association="Self.FK__Bill__EmployeeID__403A8C7D">
             <End Role="Employee" EntitySet="Employees" />
             <End Role="Bill" EntitySet="Bills" />
           </AssociationSet>
-          <AssociationSet Name="FK__Bill__OrderID__3D5E1FD2" Association="Self.FK__Bill__OrderID__3D5E1FD2">
+          <AssociationSet Name="FK__Bill__OrderID__3E52440B" Association="Self.FK__Bill__OrderID__3E52440B">
             <End Role="Order" EntitySet="Orders" />
             <End Role="Bill" EntitySet="Bills" />
           </AssociationSet>
-          <AssociationSet Name="FK__Order__ClientID__31EC6D26" Association="Self.FK__Order__ClientID__31EC6D26">
+          <AssociationSet Name="FK__Order__ClientID__32E0915F" Association="Self.FK__Order__ClientID__32E0915F">
             <End Role="Client" EntitySet="Clients" />
             <End Role="Order" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK__Order__EmployeeI__32E0915F" Association="Self.FK__Order__EmployeeI__32E0915F">
+          <AssociationSet Name="FK__ManagerAc__Emplo__286302EC" Association="Self.FK__ManagerAc__Emplo__286302EC">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="ManagerAccount" EntitySet="ManagerAccounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Order__EmployeeI__33D4B598" Association="Self.FK__Order__EmployeeI__33D4B598">
             <End Role="Employee" EntitySet="Employees" />
             <End Role="Order" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderItem__Order__37A5467C" Association="Self.FK__OrderItem__Order__37A5467C">
+          <AssociationSet Name="FK__OrderItem__Order__38996AB5" Association="Self.FK__OrderItem__Order__38996AB5">
             <End Role="Order" EntitySet="Orders" />
             <End Role="OrderItem" EntitySet="OrderItems" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderItem__Produ__38996AB5" Association="Self.FK__OrderItem__Produ__38996AB5">
+          <AssociationSet Name="FK__OrderItem__Produ__398D8EEE" Association="Self.FK__OrderItem__Produ__398D8EEE">
             <End Role="Product" EntitySet="Products" />
             <End Role="OrderItem" EntitySet="OrderItems" />
           </AssociationSet>
@@ -452,6 +488,7 @@
             <EntityTypeMapping TypeName="ShopDBModel.ManagerAccount">
               <MappingFragment StoreEntitySet="ManagerAccount">
                 <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
                 <ScalarProperty Name="Username" ColumnName="Username" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
               </MappingFragment>

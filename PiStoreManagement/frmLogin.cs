@@ -43,12 +43,10 @@ namespace PiStoreManagement
                     ).FirstOrDefault();
                 if(account != null)
                 {
-                    //MessageBox.Show("TODO: Login success");
-                    //this.Close();
-                    //new frmEmployees().Show();
-                    //Application.Run(new frmEmployees());
+                    Employee staff = ShopDB.GetShopDBEntities().Employees.FirstOrDefault(em=>em.ID == account.EmployeeID);
+                    frmMain.GetInstance().RegisterStaff(staff);
                     this.Hide();
-                    //this.Dispose();
+                    frmMain.GetInstance().Show();  
                 }
                 else
                 {
@@ -84,6 +82,11 @@ namespace PiStoreManagement
         private void btnExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void frmLogin_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            frmMain.GetInstance().Close();
         }
     }
 }

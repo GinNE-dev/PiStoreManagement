@@ -42,6 +42,8 @@ namespace PiStoreManagement.Managements
             ReloadOrderedProductGrid();
             ReloadProductGrid();
 
+            IsInOrderProgress = true;
+
             return true;
         }
 
@@ -51,7 +53,7 @@ namespace PiStoreManagement.Managements
             ShopDB.SaveChanges();
 
             _currentOrder = null;
-            this.IsInOrderProgress = false;
+            IsInOrderProgress = false;
         }
 
         private void CancelOrderProgress()
@@ -67,7 +69,7 @@ namespace PiStoreManagement.Managements
             }
 
             _currentOrder = null;
-            this.IsInOrderProgress = false;
+            IsInOrderProgress = false;
         }
 
         private Order GetNotNullCurrentOrder()
@@ -123,9 +125,17 @@ namespace PiStoreManagement.Managements
         {
             dataGridViewProducts.ClearSelection();
             dataGridViewProducts.Rows.Clear();
+
+            string keyFilter = txtSearch.Text.ToString().ToLower();
             foreach (Product p in products)
             {
-                dataGridViewProducts.Rows.Add(p.ID, p.Name, p.Price, p.Quantity, p.Decription);
+                if (
+                    p.ID.ToLower().Contains(keyFilter) ||
+                    p.Name.ToLower().Contains(keyFilter)
+                  )
+                {
+                   dataGridViewProducts.Rows.Add(p.ID, p.Name, p.Price, p.Quantity, p.Decription);
+                }
             }
         }
 
@@ -330,6 +340,22 @@ namespace PiStoreManagement.Managements
                 default:
                     break;
             }
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSearch_Click_1(object sender, EventArgs e)
+        {
+            ReloadProductGrid();
+        }
+
+        private void btnClearSearch_Click(object sender, EventArgs e)
+        {
+            txtSearch.Text = string.Empty;
+            ReloadProductGrid();
         }
     }
 

@@ -52,9 +52,16 @@ namespace PiStoreManagement.Managements
         {
             dataGridViewOrders.ClearSelection();
             dataGridViewOrders.Rows.Clear();
+
+            string keyFilter = txtSearch.Text.ToString().ToLower();
             foreach (Order o in orders)
             {
-                dataGridViewOrders.Rows.Add(o.ID, o.Client.Name, o.Client.Phone, o.OrderDate, o.TotalPrice);
+                if (
+                    o.ID.ToLower().Contains(keyFilter) ||
+                    o.Client.Name.ToLower().Contains(keyFilter) ||
+                    o.Employee.Name.ToLower().Contains(keyFilter)
+                  )
+                    dataGridViewOrders.Rows.Add(o.ID, o.Client.Name, o.Client.Phone, o.OrderDate, o.TotalPrice);
             }
             if (dataGridViewOrders.Rows.Count > 0)
             {
@@ -113,7 +120,46 @@ namespace PiStoreManagement.Managements
 
         private void dataGridViewOrders_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            DataGridViewCellCollection cells = dataGridViewOrders.Rows[e.RowIndex].Cells;
+            switch (dataGridViewOrders.Columns[e.ColumnIndex].Name)
+            {
+                case TextDictionary.CONTROL_BILL_COLUMN_NAME:
+                    DialogResult dialogResult = MessageBox.Show(TextDictionary.MESSAGE_CONFIRM_BILL,
+                        TextDictionary.TITLE_CONFIRM_BILL, MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        string ID = cells[TextDictionary.ORDER_ID_COLUMN_NAME].Value.ToString();
+                        
+                        Bill bill = ShopDB.GetShopDBEntities().Bills.FirstOrDefault(b=>b.OrderID.Equals(ID));
+                        if(bill == null)
+                        {
+                            Order order = ShopDB.GetShopDBEntities().Orders.FirstOrDefault(o => o.ID.Equals(ID));
+                            if (order != null)
+                            {
+                                bill = new Bill();
+                                bill.ID = Guid.NewGuid().ToString();
+                                bill.OrderID = order.ID;
+                                bill.ClientID = order.ClientID;
+                                bill.EmployeeID = order.EmployeeID;
+                                bill.BillDate = DateTime.Now;
+                                bill.TotalPrice = order.TotalPrice;
+                                bill.Client = order.Client;
+                                bill.Employee = order.Employee;
+                                bill.Order = order;
+                                order.Bills.Add(bill);
+                                ShopDB.SaveChanges();
+                            }
+                        }
+                        //DataExporter.ExportBill(bill);
+
+                        ReloadOrderGrid();
+                    }
+                    break;
+                default:
+
+                    break;
+            }
         }
 
         private void frmOrder_VisibleChanged(object sender, EventArgs e)
@@ -131,7 +177,29 @@ namespace PiStoreManagement.Managements
 
         private void btnCB_Click(object sender, EventArgs e)
         {
-            DataExporter.ExportBill();
+           // DataExporter.ExportBill();
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSearch_VisibleChanged(object sender, EventArgs e)
+        {
+            if(dataGridViewOrders.ColumnCount == 0) return ;
+            ReloadOrderGrid();
+        }
+
+        private void btnClearSearch_Click(object sender, EventArgs e)
+        {
+            txtSearch.Text = string.Empty;
+            ReloadOrderGrid();
+        }
+
+        private void btnSearch_Click_1(object sender, EventArgs e)
+        {
+            ReloadOrderGrid();
         }
     }
 }

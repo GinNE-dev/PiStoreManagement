@@ -17,8 +17,7 @@ namespace PiStoreManagement
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new frmLogin());
-            //Application.Run(new frmEmployees());
+
             Application.Run(new frmMain());
         }
     }

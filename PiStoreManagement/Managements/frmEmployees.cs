@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,9 +65,17 @@ namespace PiStoreManagement.Managements
         private void UpdateEmployeeGrid(IEnumerable<Employee> employees)
         {
             dataGridViewEmployees.Rows.Clear();
+
+            string keyFilter = txtSearch.Text.ToString().ToLower();
             foreach (Employee e in employees)
             {
-                dataGridViewEmployees.Rows.Add(e.ID, e.Name, e.Email, e.Phone, e.Address, e.Salary, e.HireDate);
+                if(
+                    e.ID.ToLower().Contains(keyFilter) ||
+                    e.Name.ToLower().Contains (keyFilter)
+                  )
+                {
+                    dataGridViewEmployees.Rows.Add(e.ID, e.Name, e.Email, e.Phone, e.Address, e.Salary, e.HireDate);
+                }
             }
         }
         
@@ -80,13 +89,14 @@ namespace PiStoreManagement.Managements
             dataGridViewEmployees.Columns.Add(TextDictionary.EMPLOYEE_SALARY_COLUMN_NAME, TextDictionary.EMPLOYEE_SALARY_COLUMN_TEXT);
             dataGridViewEmployees.Columns.Add(TextDictionary.EMPLOYEE_HIREDATE_COLUMN_NAME, TextDictionary.EMPLOYEE_HIREDATE_COLUMN_TEXT);
 
-            DataGridViewButtonColumn DeleteButton = new DataGridViewButtonColumn();
-            DeleteButton.Name = TextDictionary.CONTROL_DELETE_BUTTON_NAME;
-            DeleteButton.Text = TextDictionary.CONTROL_DELETE_BUTTON_TEXT;
-            DeleteButton.UseColumnTextForButtonValue = true;
+            DataGridViewButtonColumn ButtonInColumn = new DataGridViewButtonColumn();
+            ButtonInColumn.Name = TextDictionary.CONTROL_DELETE_BUTTON_NAME;
+            ButtonInColumn.Text = TextDictionary.CONTROL_DELETE_BUTTON_TEXT;
+            ButtonInColumn.FlatStyle = FlatStyle.Flat;
+            ButtonInColumn.UseColumnTextForButtonValue = true;
             if (dataGridViewEmployees.Columns[TextDictionary.CONTROL_DELETE_COLUMN_NAME] == null)
             {
-                dataGridViewEmployees.Columns.Insert(dataGridViewEmployees.Columns.Count, DeleteButton);
+                dataGridViewEmployees.Columns.Insert(dataGridViewEmployees.Columns.Count, ButtonInColumn);
             }
         }
 
@@ -97,7 +107,7 @@ namespace PiStoreManagement.Managements
 
         private void btnAddEmployee_Click(object sender, EventArgs e)
         {
-            Form root = this.MdiParent !=null ? this.MdiParent : this;
+            Form root = (this.MdiParent != null) ? this.MdiParent : this;
             Form formAddNew = new frmNewEmployee();
 
             formAddNew.StartPosition = FormStartPosition.Manual;
@@ -109,7 +119,45 @@ namespace PiStoreManagement.Managements
 
         private void dataGridViewEmployees_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            DataGridViewCellCollection cells = dataGridViewEmployees.Rows[e.RowIndex].Cells;
+            string selectedColumnName = dataGridViewEmployees.Columns[e.ColumnIndex].Name;
+            switch (selectedColumnName)
+            {
+                case TextDictionary.CONTROL_DELETE_BUTTON_NAME:
+                    DialogResult dialogResult = MessageBox.Show(TextDictionary.MESSAGE_COMFIRM_DELETE, 
+                        TextDictionary.TITLE_COMFIRM_DELETE, MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        string eID = cells[TextDictionary.EMPLOYEE_ID_COLUMN_NAME].Value.ToString();
+                        Employee employee = ShopDB.GetShopDBEntities().Employees.FirstOrDefault(em => em.ID.Equals(eID));
+                        var currentStaff = frmMain.GetInstance().GetCurrrentStaff();
+                        if(employee.ID.Equals(currentStaff.ID))
+                        {
+                            MessageBox.Show(TextDictionary.MESSAGE_CANNOT_REMOVE_YOURSELF);
+                        }
+                        else
+                        {
+                            if(employee.Bills.Count > 0)
+                            {
+                                MessageBox.Show(TextDictionary.MESSAGE_CANNOT_REMOVE_EMPLOYEE_BY_BILL);
+                            }
+                            else if (employee.Orders.Count > 0)
+                            {
+                                MessageBox.Show(TextDictionary.MESSAGE_CANNOT_REMOVE_EMPLOYEE_BY_ORDER);
+                            }
+                            else
+                            {
+                                ShopDB.GetShopDBEntities().Employees.Remove(employee);
+                                ShopDB.SaveChanges();
+                                LoadEmployeeGrid();
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -153,30 +201,75 @@ namespace PiStoreManagement.Managements
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-
+            LoadEmployeeGrid();
         }
 
         private void dataGridViewEmployees_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
             DataGridViewCellCollection cells = dataGridViewEmployees.Rows[e.RowIndex].Cells;
-            string selectedColumnName = dataGridViewEmployees.Columns[e.ColumnIndex].Name;
-            switch (selectedColumnName)
+            choseCells(cells);
+        }
+
+        private void btnAddEmployee_VisibleChanged(object sender, EventArgs e)
+        {
+            if(dataGridViewEmployees.Rows.Count == 0) return;
+            LoadEmployeeGrid();
+        }
+
+        private void btnClearSearch_Click(object sender, EventArgs e)
+        {
+            txtSearch.Text = string.Empty;
+            LoadEmployeeGrid();
+        }
+
+        private void btnImportTestData_Click(object sender, EventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+            openFileDialog.RestoreDirectory = true;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                case TextDictionary.CONTROL_DELETE_COLUMN_NAME:
-                    DialogResult dialogResult = MessageBox.Show(TextDictionary.MESSAGE_COMFIRM_DELETE, TextDictionary.TITLE_COMFIRM_DELETE, MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.Yes)
+                string filePath = openFileDialog.FileName;
+                using (var reader = new StreamReader(filePath))
+                {
+                    Employee employee;
+
+                    while (!reader.EndOfStream)
                     {
-                        string eID = cells[TextDictionary.EMPLOYEE_ID_COLUMN_NAME].Value.ToString();
-                        Employee employee = ShopDB.GetShopDBEntities().Employees.FirstOrDefault(em => em.ID.Equals(eID));
-                        ShopDB.GetShopDBEntities().Employees.Remove(employee);
-                        ShopDB.SaveChanges();
-                        LoadEmployeeGrid();
+                        var line = reader.ReadLine();
+                        var values = line.Split(',');
+                        try
+                        {
+                            
+                            employee = new Employee();
+                            employee.ID = values[0];
+                            employee.Name = values[1];
+                            employee.Email = values[2];
+                            employee.Phone = values[3];
+                            employee.Salary = double.Parse(values[4]);
+                            employee.Address = values[5];
+                            employee.HireDate = DateTime.Parse(values[6]);
+
+                            if(ShopDB.GetShopDBEntities().Employees.FirstOrDefault(em=>em.ID.Equals(employee.ID))!=null)
+                            {
+                                continue;
+                            }
+
+                            ShopDB.GetShopDBEntities().Employees.Add(employee);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            //MessageBox.Show(ex.Message);
+                        }
                     }
-                    break;
-                default:
-                    choseCells(cells);
-                    break;
+
+                    
+                    ShopDB.SaveChanges();
+                    LoadEmployeeGrid();
+                }
             }
         }
     }
